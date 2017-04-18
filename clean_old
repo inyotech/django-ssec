@@ -1,0 +1,88 @@
+#!/usr/bin/perl -w
+#
+# clean_old <hours>
+#
+# Remove expired images from the archive.  Keep <days> worth of
+# images.  Images arrive twice an hour so specifying 10 days will
+# delete all but the newest 24 * 2 * 10 = 480 images.  
+#
+
+
+use Time::Local;
+use POSIX "strftime";
+use strict;
+
+sub usage {
+	print "Usage: clean_old <days>\n";
+	print "<days> argument must be between 1 and 100\n";
+	exit;    
+}
+
+my $Days = $ARGV[0] or die usage;
+
+# Safety check on hours.
+if ($Days < 1 or $Days > 100) {
+    usage;
+}
+
+my $ImagesPerHour = 2;
+my $NumberToKeep = $Days * 24 * $ImagesPerHour;
+
+chdir "/home/inyotech/webapps/ssec";
+
+my @files = `find 'images' -name 'image_*.jpg'`;
+
+# Parse an image filename and get the time (number of seconds from
+# epoch) that the name represents.
+sub get_secs {
+
+    my $dstr = shift;
+
+    if ($dstr !~ /image_(\d*)_(\d*)_(\d*)_(\d*)_(\d*).jpg/) {
+        return;
+    }
+
+    my ($year,$month,$day,$hour,$minute) = ($1,$2,$3,$4,$5);
+    my $seconds = timegm(0,$minute,$hour,$day,$month-1,$year);
+
+    $seconds;
+}
+
+# Format the time to a pattern understood by the Javascript Date
+# object.
+sub get_str_from_secs {
+
+    my $seconds = shift;
+
+    my $timestr = strftime "%B %d %Y %T GMT", gmtime($seconds);
+
+    $timestr;
+}
+
+# Sort method, oldest first
+sub by_date {
+    # $a and $b automatically passed in
+    return get_secs($a) <=> get_secs($b);
+}
+
+my $file;
+my @all_files = ();
+
+# Sort the list of file names, put the newest first.
+foreach $file (reverse sort by_date @files) {
+    chomp($file);
+    push @all_files, $file;
+}
+
+if ($#all_files < $NumberToKeep) {
+    printf "Only found %d files, keeping %d\n", $#all_files, $NumberToKeep;
+    exit;
+}
+
+# Chop of the first $NumberToKeep, we will not delete these.
+my @keep_files = splice @all_files, 0, $NumberToKeep;
+
+foreach $file (@all_files) {
+	printf "Removing file %s\n", $file;
+	unlink $file;
+}
