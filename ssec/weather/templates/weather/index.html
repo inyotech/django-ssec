@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <style>
+      #weather {
+          position: relative;
+          width: 400px;
+          height: 300px;
+      }
+      #slider {
+          margin-top: 20px;
+          height: 5px;
+      }
+      #slider .ui-slider-handle {
+          top: -.5em;
+          width: 5px;
+
+      }
+      #slider .ui-slider {
+          height: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="weather">
+      <img id="images" src="" />
+      <button id="step-back"><span class="fa fa-fast-backward"></span></button>
+      <button id="play" ><span class="fa fa-play"></span></button>
+      <button id="pause" ><span class="fa fa-pause"></span></button>
+      <button id="step-forward" ><span class="fa fa-fast-forward"></span></button>
+      <div id="slider"></div>
+    </div>
+    <script>
+
+      var imageUrls = new Array(
+      {% autoescape off %}
+          {{ image_urls|join:', ' }}
+      {% endautoescape %}
+      );
+
+      var imageDates = new Array(
+          {{ image_dates|join:", " }}
+      );
+
+      var images = new Array(imageUrls.length);
+      var currentIndex = 0;
+
+      imageUrls.forEach(function(url, index) {
+          images[index] = new Image();
+          images[index].onload = imageLoaded;
+          images[index].src = url
+      });
+
+      var number_loaded = 0;
+
+      var timerId;
+
+      function imageLoaded() {
+          number_loaded++;
+
+          if (number_loaded == images.length) {
+              imageLoadComplete()
+          }
+      }
+
+      function imageLoadComplete() {
+          stop_animating();
+      }
+
+      function stop_animating() {
+          clearTimeout(timerId);
+          $('#pause').prop('disabled', true);
+          $('#step-backward, #play, #step-forward').prop('disabled', false);
+      }
+
+      function animate() {
+          $('#pause').prop('disabled', false);
+          $('#step-backward, #step-forward').prop('disabled', true);
+          $('#play').prop('disabled', true);
+
+          currentIndex = ++currentIndex % images.length;
+          $('#weather img#images').attr({
+              'src': images[currentIndex].src,
+              'width': '400px',
+              'height': '300px'
+          });
+          timerId = setTimeout(animate, 100);
+      }
+
+      $('#play').on('click', function() {
+          animate();
+      });
+
+      $('#pause').on('click', function() {
+          stop_animating();
+      });
+    </script>
+    <script>
+      $('#slider').slider({
+          min: 100,
+          max: 2000,
+          value: 500,
+          change: function(event, ui) {
+              console.log('change', event, ui, ui.value);
+          }
+      });
+    </script>
+  </body>
+</html>
