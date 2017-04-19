@@ -174,8 +174,6 @@
 
           var date = moment.utc({y: imageDate[1], M: imageDate[2]-1, d: imageDate[3], h: imageDate[4], m: imageDate[5]});
 
-          console.log(imageDate[0], date);
-
           $('#image-time').html('Image Time: '+date.format(dateFormat));
 
           $('#progress').progressbar('value', currentIndex);
@@ -242,7 +240,6 @@
           value: -animationDelay,
           animate: true,
           change: function(event, ui) {
-              console.log('change', event, ui, ui.value);
               animationDelay = -ui.value;
               if (isAnimating()) {
                   stop_animating();

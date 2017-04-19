@@ -10,13 +10,13 @@ def latest_images(request, number=48):
 
     number = int(number)
 
-    path = os.path.join(settings.IMAGES_PATH, 'image_*.jpg')
+    path = os.path.join(settings.IMAGES_PATH, 'ssec/image_*.jpg')
 
     images = glob.glob(path)
     images.reverse()
     images = [os.path.basename(name) for name in images[:number]]
     images.reverse()
 
-    image_urls = ['"{0}"'.format(static('weather/images/'+image)) for image in images]
+    image_urls = ['"{0}"'.format(static('ssec/'+image)) for image in images]
 
     return render(request, 'weather/index.html', {'image_urls': image_urls})

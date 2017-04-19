@@ -118,5 +118,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-
-IMAGES_PATH = os.path.join(BASE_DIR, 'weather/static/weather/images')
+STATIC_ROOT = os.path.join(BASE_DIR, '../static')
+IMAGES_PATH = os.path.join(BASE_DIR, 'weather/downloaded_images')
+STATICFILES_DIRS = (
+    IMAGES_PATH,
+)
