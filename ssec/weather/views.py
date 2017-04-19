@@ -12,7 +12,7 @@ def latest_images(request, number=48):
     path = os.path.join(settings.IMAGES_PATH, 'image_*.jpg')
 
     images = glob.glob(path)
-    images.reverse()
+    images.sort()
     images = [os.path.basename(name) for name in images[:number]]
 
     image_urls = ['"{0}"'.format(static('weather/images/'+image)) for image in images]

@@ -11,10 +11,13 @@
           position: relative;
           width: 400px;
           height: 300px;
+          text-align: center;
       }
       #slider {
-          margin-top: 20px;
+          margin: 20px auto 0 auto;
           height: 5px;
+          width: 50%;
+          text-align: center;
       }
       #slider .ui-slider-handle {
           top: -.5em;
@@ -29,7 +32,7 @@
   <body>
     <div id="weather">
       <img id="images" src="" />
-      <button id="step-back"><span class="fa fa-fast-backward"></span></button>
+      <button id="step-backward"><span class="fa fa-fast-backward"></span></button>
       <button id="play" ><span class="fa fa-play"></span></button>
       <button id="pause" ><span class="fa fa-pause"></span></button>
       <button id="step-forward" ><span class="fa fa-fast-forward"></span></button>
@@ -58,7 +61,8 @@
 
       var number_loaded = 0;
 
-      var timerId;
+      var animationDelay = 500;
+      var timerId = false;
 
       function imageLoaded() {
           number_loaded++;
@@ -70,27 +74,46 @@
 
       function imageLoadComplete() {
           stop_animating();
+          step(1);
       }
 
       function stop_animating() {
           clearTimeout(timerId);
+          timerId = false;
           $('#pause').prop('disabled', true);
           $('#step-backward, #play, #step-forward').prop('disabled', false);
+      }
+
+      function step(count) {
+
+          function mod(n, m) {
+              return ((n % m) + m) % m;
+          }
+
+          currentIndex += count;
+          currentIndex = mod(currentIndex, images.length);
+          $('#weather img#images').attr({
+              'src': images[currentIndex].src,
+              'width': '400px',
+              'height': '300px'
+          });
+      }
+
+      function isAnimating() {
+          return timerId;
       }
 
       function animate() {
           $('#pause').prop('disabled', false);
           $('#step-backward, #step-forward').prop('disabled', true);
           $('#play').prop('disabled', true);
-
-          currentIndex = ++currentIndex % images.length;
-          $('#weather img#images').attr({
-              'src': images[currentIndex].src,
-              'width': '400px',
-              'height': '300px'
-          });
-          timerId = setTimeout(animate, 100);
+          step(1);
+          timerId = setTimeout(animate, animationDelay);
       }
+
+      $('#step-backward').on('click', function() {
+          step(-1);
+      });
 
       $('#play').on('click', function() {
           animate();
@@ -99,14 +122,23 @@
       $('#pause').on('click', function() {
           stop_animating();
       });
-    </script>
-    <script>
+
+      $('#step-forward').on('click', function() {
+          step(1);
+      });
+
       $('#slider').slider({
-          min: 100,
-          max: 2000,
-          value: 500,
+          min: -1000,
+          max: -25,
+          value: -animationDelay,
+          animate: true,
           change: function(event, ui) {
               console.log('change', event, ui, ui.value);
+              animationDelay = -ui.value;
+              if (isAnimating()) {
+                  stop_animating();
+                  animate();
+              }
           }
       });
     </script>
