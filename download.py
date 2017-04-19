@@ -6,7 +6,7 @@ import pprint
 import requests
 
 url = "http://www.ssec.wisc.edu/data/us_comp/image7.jpg"
-base_path = "/Users/scottb/PycharmProjects/ssec"
+base_path = "/Users/scottb/PycharmProjects/ssec/ssec/weather/static/weather/images"
 
 r = requests.get(url, stream=True)
 
@@ -26,7 +26,7 @@ if download_time.minute < 30:
 else:
     download_time = download_time.replace(minute=0)
 
-image_filename = download_time.strftime(base_path + '/images/image_%Y_%m_%d_%H_%M.jpg')
+image_filename = download_time.strftime(base_path + '/image_%Y_%m_%d_%H_%M.jpg')
 
 pprint.pprint(image_filename)
 

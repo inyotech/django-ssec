@@ -2,43 +2,108 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
     <script src="//code.jquery.com/jquery-1.12.4.js"></script>
     <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <style>
-      #weather {
-          position: relative;
-          width: 400px;
-          height: 300px;
+      body {
+          font-family: 'Lato', sans-serif;
+          background-color: aliceblue;
           text-align: center;
       }
+      #weather {
+          background-color: white;
+          position: relative;
+          width: 600px;
+          text-align: center;
+          margin: 2em auto;
+          padding: 1.5em 3em 1em 3em;
+          border: 1px solid #ddd;
+
+      }
+      #time {
+          font-size: smaller;
+      }
+      #progress.ui-progressbar {
+          height: .75em;
+          width: 50%;
+          margin: .5em auto .5em auto;
+      }
+      #buttons {
+          text-align: center;
+      }
+      #counter {
+            text-align: right;
+      }
       #slider {
+          font-size: small;
           margin: 20px auto 0 auto;
           height: 5px;
-          width: 50%;
+          width: 45%;
           text-align: center;
       }
       #slider .ui-slider-handle {
           top: -.5em;
-          width: 5px;
-
       }
       #slider .ui-slider {
           height: 5px;
       }
+      #slider-left {
+          float: left;
+          margin-top: .5em;
+      }
+      #slider-right {
+          float: right;
+          margin-top: .5em;
+      }
+      #courtesy {
+          text-align: center;
+          font-size: x-small;
+          margin-top: 3em;
+
+      }
+      footer {
+      font-size: small;
+      text-align: center;
+      }
     </style>
   </head>
   <body>
+    <h2>Satellite Weather Images</h2>
+    <h3>Animated 24 Hour History</h3>
     <div id="weather">
+      <div id="time">
+        <div id="local-time"></div>
+        <div id="image-time"></div>
+      </div>
+      <div id="progress"></div>
       <img id="images" src="" />
-      <button id="step-backward"><span class="fa fa-fast-backward"></span></button>
-      <button id="play" ><span class="fa fa-play"></span></button>
-      <button id="pause" ><span class="fa fa-pause"></span></button>
-      <button id="step-forward" ><span class="fa fa-fast-forward"></span></button>
-      <div id="slider"></div>
+      <div id="counter" style="font-size:small;" ></div>
+      <div id="buttons">
+        <button id="step-backward"><i class="fa fa-step-backward"></i></button>
+        <button id="play" ><i class="fa fa-play"></i></button>
+        <button id="pause" ><i class="fa fa-pause"></i></button>
+        <button id="step-forward" ><i class="fa fa-step-forward"></i></button>
+        <div style="margin:.5em 0 1em 0;">Animation Control</div>
+      </div>
+      <div id="slider">
+        <div id="slider-left">-</div>
+        <div id="slider-right">+</div>
+      </div>
+      <div style="margin-top:1em;">Playback Speed</div>
+
+      <div id="courtesy">
+        Images courtesy <a href="http://www.ssec.wisc.edu/data/">Space Science and Engineering Center</a>
+        University of Wisconsin-Madison
+      </div>
+
     </div>
     <script>
+
+      var dateFormat = 'ddd, MMM D, YYYY HH:mm:ss';
 
       var imageUrls = new Array(
       {% autoescape off %}
@@ -51,7 +116,7 @@
       );
 
       var images = new Array(imageUrls.length);
-      var currentIndex = 0;
+      var currentIndex = images.length-1;
 
       imageUrls.forEach(function(url, index) {
           images[index] = new Image();
@@ -61,7 +126,7 @@
 
       var number_loaded = 0;
 
-      var animationDelay = 500;
+      var animationDelay = 330;
       var timerId = false;
 
       function imageLoaded() {
@@ -73,6 +138,7 @@
       }
 
       function imageLoadComplete() {
+          updateLocalTime();
           stop_animating();
           step(1);
       }
@@ -92,11 +158,26 @@
 
           currentIndex += count;
           currentIndex = mod(currentIndex, images.length);
+
+          var re = new RegExp(/image_(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2}).jpg/);
+          var imageDate = re.exec(images[currentIndex].src);
+
+          var date = moment.utc({y: imageDate[1], M: imageDate[2]-1, d: imageDate[3], h: imageDate[4], m: imageDate[5]});
+
+          console.log(imageDate[0], date);
+
+          $('#image-time').html('Image Time: '+date.format(dateFormat));
+
+          $('#progress').progressbar('value', currentIndex);
+
+          $('#counter').text('Image: '+(currentIndex+1)+' of '+images.length);
+
           $('#weather img#images').attr({
               'src': images[currentIndex].src,
-              'width': '400px',
-              'height': '300px'
+              'width': '600px',
+              'height': '450px'
           });
+
       }
 
       function isAnimating() {
@@ -109,6 +190,12 @@
           $('#play').prop('disabled', true);
           step(1);
           timerId = setTimeout(animate, animationDelay);
+      }
+
+      function updateLocalTime() {
+          var date = moment();
+          $('#local-time').html('Local Time: ' + date.format(dateFormat));
+          setTimeout(updateLocalTime, 1000);
       }
 
       $('#step-backward').on('click', function() {
@@ -127,6 +214,11 @@
           step(1);
       });
 
+      $('#progress').progressbar({
+         value: currentIndex,
+         max: images.length-1
+      });
+
       $('#slider').slider({
           min: -1000,
           max: -25,
@@ -142,5 +234,8 @@
           }
       });
     </script>
+    <footer>
+      &copy; Copyright 2009-20017 Inyo Technical Services
+    </footer>
   </body>
 </html>

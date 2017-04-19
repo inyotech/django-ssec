@@ -1,5 +1,6 @@
 import os
 import glob
+import pprint
 
 from django.conf import settings
 from django.shortcuts import render
@@ -12,8 +13,9 @@ def latest_images(request, number=48):
     path = os.path.join(settings.IMAGES_PATH, 'image_*.jpg')
 
     images = glob.glob(path)
-    images.sort()
+    images.reverse()
     images = [os.path.basename(name) for name in images[:number]]
+    images.reverse()
 
     image_urls = ['"{0}"'.format(static('weather/images/'+image)) for image in images]
 

@@ -119,4 +119,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-IMAGES_PATH = os.path.join(BASE_DIR, 'images')
+IMAGES_PATH = os.path.join(BASE_DIR, 'weather/static/weather/images')
