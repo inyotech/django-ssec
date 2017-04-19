@@ -34,6 +34,10 @@
       }
       #buttons {
           text-align: center;
+
+      }
+      button.ui-button {
+          font-size: small;
       }
       #counter {
             text-align: right;
@@ -59,6 +63,12 @@
           float: right;
           margin-top: .5em;
       }
+      .ui-tooltip {
+          box-shadow: none;
+      }
+      .ui-tooltip-content {
+          font-size: x-small;
+      }
       #courtesy {
           text-align: center;
           font-size: x-small;
@@ -66,8 +76,8 @@
 
       }
       footer {
-      font-size: small;
-      text-align: center;
+          font-size: small;
+          text-align: center;
       }
     </style>
   </head>
@@ -83,13 +93,13 @@
       <img id="images" src="" />
       <div id="counter" style="font-size:small;" ></div>
       <div id="buttons">
-        <button id="step-backward"><i class="fa fa-step-backward"></i></button>
-        <button id="play" ><i class="fa fa-play"></i></button>
-        <button id="pause" ><i class="fa fa-pause"></i></button>
-        <button id="step-forward" ><i class="fa fa-step-forward"></i></button>
+        <button id="step-backward" title="Back 1 frame"><i class="fa fa-step-backward"></i></button>
+        <button id="play" title="Start animating"><i class="fa fa-play"></i></button>
+        <button id="pause" title="Stop animation"><i class="fa fa-pause"></i></button>
+        <button id="step-forward" title="Forward 1 frame"><i class="fa fa-step-forward"></i></button>
         <div style="margin:.5em 0 1em 0;">Animation Control</div>
       </div>
-      <div id="slider">
+      <div id="slider" title="Adjust speed">
         <div id="slider-left">-</div>
         <div id="slider-right">+</div>
       </div>
@@ -146,8 +156,8 @@
       function stop_animating() {
           clearTimeout(timerId);
           timerId = false;
-          $('#pause').prop('disabled', true);
-          $('#step-backward, #play, #step-forward').prop('disabled', false);
+          $('#pause').button('disable');
+          $('#step-backward, #play, #step-forward').button('enable');
       }
 
       function step(count) {
@@ -185,9 +195,8 @@
       }
 
       function animate() {
-          $('#pause').prop('disabled', false);
-          $('#step-backward, #step-forward').prop('disabled', true);
-          $('#play').prop('disabled', true);
+          $('#pause').button('enable');
+          $('#step-backward, #play, #step-forward').button('disable');
           step(1);
           timerId = setTimeout(animate, animationDelay);
       }
@@ -219,6 +228,14 @@
          max: images.length-1
       });
 
+      $('#step-backward').button();
+
+      $('#play').button();
+
+      $('#pause').button();
+
+      $('#step-forward').button();
+
       $('#slider').slider({
           min: -1000,
           max: -25,
@@ -233,6 +250,11 @@
               }
           }
       });
+      $(document).tooltip({
+          open: function(event, ui) {
+              ui.tooltip.delay(1000).fadeTo(3000, 0);
+          }
+       });
     </script>
     <footer>
       &copy; Copyright 2009-20017 Inyo Technical Services
