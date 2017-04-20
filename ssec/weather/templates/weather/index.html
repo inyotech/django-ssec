@@ -14,22 +14,52 @@
           background-color: aliceblue;
           text-align: center;
       }
+
+      .loading {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          margin-top: -45px;
+          margin-left: -45px;
+          border: 16px solid #f3f3f3;
+          border-radius: 50%;
+          border-top: 16px solid #cccccc;
+          width: 60px;
+          height: 60px;
+          -webkit-animation: spin 2s linear infinite;
+          animation: spin 2s linear infinite;
+      }
+
+      @-webkit-keyframes spin {
+          0% { -webkit-transform: rotate(0deg); }
+          100% { -webkit-transform: rotate(360deg); }
+      }
+
+      @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+      }
+
       #weather {
-          background-color: white;
           position: relative;
+          background-color: white;
           width: 600px;
           text-align: center;
           margin: 2em auto;
-          padding: 1.5em 3em 1em 3em;
+          padding: 1em 3em 1em 3em;
           border: 1px solid #ddd;
 
       }
       img#images {
+          position: absolute;
+          top: 0;
+          left: 0;
           width: 600px;
           height: 450px;
       }
       #time {
           font-size: smaller;
+          line-height: 150%;
       }
       #progress.ui-progressbar {
           height: .75em;
@@ -94,8 +124,11 @@
         <div id="image-time">...</div>
       </div>
       <div id="progress"></div>
-      <img id="images" src="" />
-      <div id="counter" style="font-size:small;" ></div>
+      <div id="loading" style="position:relative;width:600px;height:450px;border:1px solid #ddd;" >
+        <div class="loading"></div>
+        <img id="images" style="display:none;" src="" />
+      </div>
+      <div id="counter" style="font-size:small;" >&nbsp;</div>
       <div id="buttons">
         <button id="step-backward" title="Back 1 frame"><i class="fa fa-step-backward"></i></button>
         <button id="play" title="Start animating"><i class="fa fa-play"></i></button>
@@ -119,6 +152,8 @@
 
       var dateFormat = 'ddd, MMM D, YYYY HH:mm:ss';
 
+      updateLocalTime();
+
       var imageUrls = new Array(
       {% autoescape off %}
           {{ image_urls|join:', ' }}
@@ -138,23 +173,25 @@
           images[index].src = url
       });
 
-      var number_loaded = 0;
+      var numLoaded = 0;
 
       var animationDelay = 330;
       var timerId = false;
 
       function imageLoaded() {
-          number_loaded++;
 
-          if (number_loaded == images.length) {
+          $('#progress').progressbar('value', ++numLoaded);
+
+          if (numLoaded == images.length) {
               imageLoadComplete()
           }
       }
 
       function imageLoadComplete() {
-          updateLocalTime();
           stop_animating();
           step(1);
+          $('.loading').hide('slow');
+          $('#weather #images').fadeIn('slow');
       }
 
       function stop_animating() {
