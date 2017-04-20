@@ -6,7 +6,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.contrib.staticfiles.templatetags.staticfiles import static
 
-def latest_images(request, number=48):
+def index(request, number=48):
 
     number = int(number)
 
