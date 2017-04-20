@@ -14,7 +14,6 @@ class Command(BaseCommand):
 
     base_path = settings.IMAGES_PATH
 
-
     def add_arguments(self, parser):
         pass
 
@@ -38,7 +37,7 @@ class Command(BaseCommand):
         else:
             download_time = download_time.replace(minute=0)
 
-        image_filename = download_time.strftime(os.path.join(self.base_path, 'ssec/image_%Y_%m_%d_%H_%M.jpg'))
+        image_filename = download_time.strftime(os.path.join(self.base_path, 'image_%Y_%m_%d_%H_%M.jpg'))
 
         with open(image_filename, 'wb') as output:
             shutil.copyfileobj(r.raw, output)
