@@ -1,0 +1,7 @@
+LOG=/usr/bin/logger
+
+DOWNLOAD_LATEST=/home/inyotech/webapps/ssec_python/bin/download_latest.sh
+
+# min	hr	day	mon	week	command
+15,45   *       *       *       *       $DOWNLOAD_LATEST 2>&1 | /usr/bin/logger -t download_ssec_latest
+
