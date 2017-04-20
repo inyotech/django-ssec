@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
   <head>
@@ -5,115 +6,11 @@
     <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="{% static 'weather/css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'weather/css/spinner.css' %}">
     <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
     <script src="//code.jquery.com/jquery-1.12.4.js"></script>
     <script src="//code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-    <style>
-      body {
-          font-family: 'Lato', sans-serif;
-          background-color: aliceblue;
-          text-align: center;
-      }
-
-      .loading {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          margin-top: -45px;
-          margin-left: -45px;
-          border: 16px solid #f3f3f3;
-          border-radius: 50%;
-          border-top: 16px solid #cccccc;
-          width: 60px;
-          height: 60px;
-          -webkit-animation: spin 2s linear infinite;
-          animation: spin 2s linear infinite;
-      }
-
-      @-webkit-keyframes spin {
-          0% { -webkit-transform: rotate(0deg); }
-          100% { -webkit-transform: rotate(360deg); }
-      }
-
-      @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-      }
-
-      #weather {
-          position: relative;
-          background-color: white;
-          width: 600px;
-          text-align: center;
-          margin: 2em auto;
-          padding: 1em 3em 1em 3em;
-          border: 1px solid #ddd;
-
-      }
-      img#images {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 600px;
-          height: 450px;
-      }
-      #time {
-          font-size: smaller;
-          line-height: 150%;
-      }
-      #progress.ui-progressbar {
-          height: .75em;
-          width: 50%;
-          margin: .5em auto .5em auto;
-      }
-      #buttons {
-          text-align: center;
-
-      }
-      button.ui-button {
-          font-size: small;
-      }
-      #counter {
-            text-align: right;
-      }
-      #slider {
-          font-size: small;
-          margin: 20px auto 0 auto;
-          height: 5px;
-          width: 45%;
-          text-align: center;
-      }
-      #slider .ui-slider-handle {
-          top: -.5em;
-      }
-      #slider .ui-slider {
-          height: 5px;
-      }
-      #slider-left {
-          float: left;
-          margin-top: .5em;
-      }
-      #slider-right {
-          float: right;
-          margin-top: .5em;
-      }
-      .ui-tooltip {
-          box-shadow: none;
-      }
-      .ui-tooltip-content {
-          font-size: x-small;
-      }
-      #courtesy {
-          text-align: center;
-          font-size: x-small;
-          margin-top: 3em;
-
-      }
-      footer {
-          font-size: small;
-          text-align: center;
-      }
-    </style>
   </head>
   <body>
     <h2>Satellite Weather Images</h2>
@@ -124,9 +21,9 @@
         <div id="image-time">...</div>
       </div>
       <div id="progress"></div>
-      <div id="loading" style="position:relative;width:600px;height:450px;border:1px solid #ddd;" >
-        <div class="loading"></div>
-        <img id="images" style="display:none;" src="" />
+      <div id="image-wrapper" style="" >
+        <div class="spinner"></div>
+        <img style="display:none;" src="" />
       </div>
       <div id="counter" style="font-size:small;" >&nbsp;</div>
       <div id="buttons">
@@ -146,156 +43,15 @@
         Images courtesy <a href="http://www.ssec.wisc.edu/data/">Space Science and Engineering Center</a>
         University of Wisconsin-Madison
       </div>
-
     </div>
-    <script>
-
-      var dateFormat = 'ddd, MMM D, YYYY HH:mm:ss';
-
-      updateLocalTime();
-
-      var imageUrls = new Array(
-      {% autoescape off %}
-          {{ image_urls|join:', ' }}
-      {% endautoescape %}
-      );
-
-      var imageDates = new Array(
-          {{ image_dates|join:", " }}
-      );
-
-      var images = new Array(imageUrls.length);
-      var currentIndex = images.length-1;
-
-      imageUrls.forEach(function(url, index) {
-          images[index] = new Image();
-          images[index].onload = imageLoaded;
-          images[index].src = url
-      });
-
-      var numLoaded = 0;
-
-      var animationDelay = 330;
-      var timerId = false;
-
-      function imageLoaded() {
-
-          $('#progress').progressbar('value', ++numLoaded);
-
-          if (numLoaded == images.length) {
-              imageLoadComplete()
-          }
-      }
-
-      function imageLoadComplete() {
-          stop_animating();
-          step(1);
-          $('.loading').hide('slow');
-          $('#weather #images').fadeIn('slow');
-      }
-
-      function stop_animating() {
-          clearTimeout(timerId);
-          timerId = false;
-          $('#pause').button('disable');
-          $('#step-backward, #play, #step-forward').button('enable');
-      }
-
-      function step(count) {
-
-          function mod(n, m) {
-              return ((n % m) + m) % m;
-          }
-
-          currentIndex += count;
-          currentIndex = mod(currentIndex, images.length);
-
-          var re = new RegExp(/image_(\d{4})_(\d{2})_(\d{2})_(\d{2})_(\d{2}).jpg/);
-          var imageDate = re.exec(images[currentIndex].src);
-
-          var date = moment.utc({y: imageDate[1], M: imageDate[2]-1, d: imageDate[3], h: imageDate[4], m: imageDate[5]});
-
-          $('#image-time').html('Image Time: '+date.format(dateFormat));
-
-          $('#progress').progressbar('value', currentIndex);
-
-          $('#counter').text('Image: '+(currentIndex+1)+' of '+images.length);
-
-          $('#weather img#images').attr({
-              'src': images[currentIndex].src,
-              'width': '600px',
-              'height': '450px'
-          });
-
-      }
-
-      function isAnimating() {
-          return timerId;
-      }
-
-      function animate() {
-          $('#pause').button('enable');
-          $('#step-backward, #play, #step-forward').button('disable');
-          step(1);
-          timerId = setTimeout(animate, animationDelay);
-      }
-
-      function updateLocalTime() {
-          var date = moment();
-          $('#local-time').html('Local Time: ' + date.format(dateFormat));
-          setTimeout(updateLocalTime, 1000);
-      }
-
-      $('#step-backward').on('click', function() {
-          step(-1);
-      });
-
-      $('#play').on('click', function() {
-          animate();
-      });
-
-      $('#pause').on('click', function() {
-          stop_animating();
-      });
-
-      $('#step-forward').on('click', function() {
-          step(1);
-      });
-
-      $('#progress').progressbar({
-         value: currentIndex,
-         max: images.length-1
-      });
-
-      $('#step-backward').button();
-
-      $('#play').button();
-
-      $('#pause').button();
-
-      $('#step-forward').button();
-
-      $('#slider').slider({
-          min: -1000,
-          max: -25,
-          value: -animationDelay,
-          animate: true,
-          change: function(event, ui) {
-              animationDelay = -ui.value;
-              if (isAnimating()) {
-                  stop_animating();
-                  animate();
-              }
-          }
-      });
-      $(document).tooltip({
-          open: function(event, ui) {
-              ui.tooltip.delay(1000).fadeTo(3000, 0);
-          }
-       });
-    </script>
     <footer>
       &copy; Copyright 2009-20017 Inyo Technical Services
     </footer>
+    <script>
+      var imageUrls = new Array(
+        {% autoescape off %}{{ image_urls|join:', ' }}{% endautoescape %}
+      );
+    </script>
+    <script src="{% static 'weather/js/app.js' %}"></script>
   </body>
 </html>

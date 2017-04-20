@@ -1,3 +1,4 @@
+.DS_Store
 ssec/weather/downloaded_images
 ssec/ssec/settings.py
 venv
