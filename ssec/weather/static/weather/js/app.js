@@ -27,7 +27,7 @@ function imageLoaded() {
 
 function imageLoadComplete() {
     stop_animating();
-    step(1);
+    step(0);
     $('.loading').hide('slow');
     $('#weather #image-wrapper img').fadeIn('slow');
 }
@@ -53,7 +53,7 @@ function step(count) {
 
     var date = moment.utc({y: imageDate[1], M: imageDate[2]-1, d: imageDate[3], h: imageDate[4], m: imageDate[5]});
 
-    $('#image-time').html('Image Time: '+date.format(dateFormat));
+    $('#image-time').html('Image Time: '+date.local().format(dateFormat));
 
     $('#progress').progressbar('value', currentIndex);
 
