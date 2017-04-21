@@ -1,0 +1,87 @@
+body {
+    font-family: 'Lato', sans-serif;
+    background-color: aliceblue;
+    text-align: center;
+}
+
+#weather {
+    position: relative;
+    background-color: white;
+    width: 600px;
+    text-align: center;
+    margin: 2em auto;
+    padding: 1em 3em 1em 3em;
+    border: 1px solid #ddd;
+
+}
+
+#image-wrapper {
+    position: relative;
+    width: 600px;
+    height: 450px;
+    border:1px solid #ddd;
+}
+
+#image-wrapper img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 600px;
+    height: 450px;
+}
+#time {
+    font-size: smaller;
+    line-height: 150%;
+}
+#progress.ui-progressbar {
+    height: .75em;
+    width: 50%;
+    margin: .5em auto .5em auto;
+}
+#buttons {
+    text-align: center;
+
+}
+button.ui-button {
+    font-size: small;
+}
+#counter {
+      text-align: right;
+}
+#slider {
+    font-size: small;
+    margin: 20px auto 0 auto;
+    height: 5px;
+    width: 45%;
+    text-align: center;
+}
+#slider .ui-slider-handle {
+    top: -.5em;
+}
+#slider .ui-slider {
+    height: 5px;
+}
+#slider-left {
+    float: left;
+    margin-top: .5em;
+}
+#slider-right {
+    float: right;
+    margin-top: .5em;
+}
+.ui-tooltip {
+    box-shadow: none;
+}
+.ui-tooltip-content {
+    font-size: x-small;
+}
+#courtesy {
+    text-align: center;
+    font-size: x-small;
+    margin-top: 3em;
+
+}
+footer {
+    font-size: small;
+    text-align: center;
+}
