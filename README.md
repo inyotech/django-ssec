@@ -5,7 +5,7 @@ images downloaded from the [Space Sciences and Engineering Center
 (SSEC) at the University of
 Wisconsin-Madison](http://www.ssec.wisc.edu/data/)
 These images are produced at regular intervals and made available for
-public download [here](http://www.ssec.wisc.edu/data/).
+public download.
 
 This project contains a periodic task that downloads these images to
 local storage.  A minimal django python web application serves these
@@ -42,5 +42,4 @@ they are available.
 
 ```
 $ python manage.py downloadimage
-
-
+```
