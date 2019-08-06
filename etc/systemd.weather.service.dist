@@ -1,0 +1,13 @@
+[Unit]
+Description=WSGI server for amimated weather images
+Documentation=http://github.com/inyotech/django-ssec
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/inyotech/webapps/django-ssec
+ExecStart=/home/inyotech/webapps/django-ssec/venv/bin/gunicorn --workers=4 --bind=127.0.0.1:8080 ssec.wsgi:application 
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

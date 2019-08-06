@@ -1,0 +1,31 @@
+<VirtualHost *:80>
+
+    # This is name based virtual hosting. So place an appropriate server name here.
+    ServerName weather.inyotech.com
+    ServerAdmin scottb@inyotech.com
+
+    WSGIScriptAlias / /usr/local/webapps/django-ssec/ssec/ssec/wsgi.py
+    <Directory /usr/local/webapps/django-ssec/ssec/ssec>
+        <Files wsgi.py>
+            Require all granted
+        </Files>
+    </Directory>
+
+    WSGIDaemonProcess weather python-home=/usr/local/webapps/django-ssec/venv python-path=/usr/local/webapps/django-ssec/ssec
+    WSGIProcessGroup weather
+
+    Alias /static /usr/local/webapps/django-ssec/ssec/static
+    <Directory /usr/local/webapps/django-ssec/ssec/static>
+        Require all granted
+    </Directory>
+
+    Alias /ssec_downloads /usr/local/webapps/django-ssec/ssec/weather/downloaded_images/ssec
+    <Directory /usr/local/webapps/django-ssec/ssec/weather/downloaded_images/ssec>
+        Require all granted
+    </Directory>
+    LogLevel warn
+
+    # PROJECT_NAME is used to seperate the log files of this application
+    ErrorLog    ${APACHE_LOG_DIR}/weather_error.log
+    CustomLog   ${APACHE_LOG_DIR}/weather_access.log combined
+</VirtualHost>
